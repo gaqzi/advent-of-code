@@ -4,23 +4,8 @@ import (
 	"strings"
 )
 
-var requiredFields map[string]func(string) bool
-
-func init() {
-	requiredFields = map[string]func(string) bool{
-		"byr": IsValidByr,
-		"iyr": IsValidIyr,
-		"eyr": IsValidEyr,
-		"hgt": IsValidHgt,
-		"hcl": IsValidHcl,
-		"ecl": IsValidEcl,
-		"pid": IsValidPid,
-	}
-}
-
 func IsValidPassportSimple(passport []string) bool {
 	return isValidPassport(passport, true)
-
 }
 
 func IsValidPassport(passport []string) bool {
@@ -31,12 +16,17 @@ func isValidPassport(p []string, simple bool) bool {
 	var hasRequired int
 	for _, line := range p {
 		for _, segment := range strings.Split(line, " ") {
-			divideAt := strings.Index(segment, ":")
+			kv := strings.Split(segment, ":")
 
-			if valid, ok := requiredFields[segment[:divideAt]]; ok {
-				if simple || valid(segment[divideAt+1:]) {
+			if simple {
+				if isRequiredField(kv[0]) {
 					hasRequired++
 				}
+				continue
+			}
+
+			if isValid(kv[0], kv[1]) {
+				hasRequired++
 			}
 		}
 	}

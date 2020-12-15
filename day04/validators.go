@@ -4,7 +4,22 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
+
+var requiredFields map[string]func(string) bool
+
+func init() {
+	requiredFields = map[string]func(string) bool{
+		"byr": isValidByr,
+		"iyr": isValidIyr,
+		"eyr": isValidEyr,
+		"hgt": isValidHgt,
+		"hcl": isValidHcl,
+		"ecl": isValidEcl,
+		"pid": isValidPid,
+	}
+}
 
 func rangeValidator(min, max int) func(string) bool {
 	return func(s string) bool {
@@ -41,17 +56,17 @@ func setValidator(values ...string) func(string) bool {
 }
 
 var (
-	IsValidByr   = rangeValidator(1920, 2002)
-	IsValidIyr   = rangeValidator(2010, 2020)
-	IsValidEyr   = rangeValidator(2020, 2030)
+	isValidByr   = rangeValidator(1920, 2002)
+	isValidIyr   = rangeValidator(2010, 2020)
+	isValidEyr   = rangeValidator(2020, 2030)
 	isValidHgtCM = rangeValidator(150, 193)
 	isValidHgtIN = rangeValidator(59, 76)
-	IsValidHcl   = regexValidator(`^#[\da-fA-F]{6}$`)
-	IsValidEcl   = setValidator("amb", "blu", "brn", "gry", "grn", "hzl", "oth")
-	IsValidPid   = regexValidator(`^\d{9}$`)
+	isValidHcl   = regexValidator(`^#[\da-fA-F]{6}$`)
+	isValidEcl   = setValidator("amb", "blu", "brn", "gry", "grn", "hzl", "oth")
+	isValidPid   = regexValidator(`^\d{9}$`)
 )
 
-var IsValidHgt = func(s string) bool {
+var isValidHgt = func(s string) bool {
 	suffixPos := len(s) - 2
 
 	switch s[suffixPos:] {
@@ -62,4 +77,14 @@ var IsValidHgt = func(s string) bool {
 	default:
 		return false
 	}
+}
+
+func isValid(typ, val string) bool {
+	valid, ok := requiredFields[strings.ToLower(typ)]
+	return ok && valid(val)
+}
+
+func isRequiredField(name string) bool {
+	_, ok := requiredFields[name]
+	return ok
 }
