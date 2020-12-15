@@ -19,28 +19,22 @@ func init() {
 }
 
 func IsValidPassportSimple(passport []string) bool {
-	var hasRequired int
-	for _, line := range passport {
-		for _, segment := range strings.Split(line, " ") {
-			divideAt := strings.Index(segment, ":")
+	return isValidPassport(passport, true)
 
-			if _, ok := requiredFields[segment[:divideAt]]; ok {
-				hasRequired++
-			}
-		}
-	}
-
-	return hasRequired == len(requiredFields)
 }
 
 func IsValidPassport(passport []string) bool {
+	return isValidPassport(passport, false)
+}
+
+func isValidPassport(p []string, simple bool) bool {
 	var hasRequired int
-	for _, line := range passport {
+	for _, line := range p {
 		for _, segment := range strings.Split(line, " ") {
 			divideAt := strings.Index(segment, ":")
 
 			if valid, ok := requiredFields[segment[:divideAt]]; ok {
-				if valid(segment[divideAt+1:]) {
+				if simple || valid(segment[divideAt+1:]) {
 					hasRequired++
 				}
 			}
