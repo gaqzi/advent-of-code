@@ -10,14 +10,30 @@ import (
 var requiredFields map[string]func(string) bool
 
 func init() {
+	var (
+		isValidHgtCM = rangeValidator(150, 193)
+		isValidHgtIN = rangeValidator(59, 76)
+	)
+
 	requiredFields = map[string]func(string) bool{
-		"byr": isValidByr,
-		"iyr": isValidIyr,
-		"eyr": isValidEyr,
-		"hgt": isValidHgt,
-		"hcl": isValidHcl,
-		"ecl": isValidEcl,
-		"pid": isValidPid,
+		"byr": rangeValidator(1920, 2002),
+		"iyr": rangeValidator(2010, 2020),
+		"eyr": rangeValidator(2020, 2030),
+		"hcl": regexValidator(`^#[\da-fA-F]{6}$`),
+		"ecl": setValidator("amb", "blu", "brn", "gry", "grn", "hzl", "oth"),
+		"pid": regexValidator(`^\d{9}$`),
+		"hgt": func(s string) bool {
+			suffixPos := len(s) - 2
+
+			switch s[suffixPos:] {
+			case "cm":
+				return isValidHgtCM(s[:suffixPos])
+			case "in":
+				return isValidHgtIN(s[:suffixPos])
+			default:
+				return false
+			}
+		},
 	}
 }
 
@@ -52,30 +68,6 @@ func setValidator(values ...string) func(string) bool {
 	return func(s string) bool {
 		_, ok := allValid[s]
 		return ok
-	}
-}
-
-var (
-	isValidByr   = rangeValidator(1920, 2002)
-	isValidIyr   = rangeValidator(2010, 2020)
-	isValidEyr   = rangeValidator(2020, 2030)
-	isValidHgtCM = rangeValidator(150, 193)
-	isValidHgtIN = rangeValidator(59, 76)
-	isValidHcl   = regexValidator(`^#[\da-fA-F]{6}$`)
-	isValidEcl   = setValidator("amb", "blu", "brn", "gry", "grn", "hzl", "oth")
-	isValidPid   = regexValidator(`^\d{9}$`)
-)
-
-var isValidHgt = func(s string) bool {
-	suffixPos := len(s) - 2
-
-	switch s[suffixPos:] {
-	case "cm":
-		return isValidHgtCM(s[:suffixPos])
-	case "in":
-		return isValidHgtIN(s[:suffixPos])
-	default:
-		return false
 	}
 }
 
