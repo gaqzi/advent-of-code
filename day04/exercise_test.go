@@ -2,10 +2,9 @@ package day04_test
 
 import (
 	"advent-of-code/day04"
+	"advent-of-code/file"
 	"fmt"
 	"gotest.tools/v3/assert"
-	"io/ioutil"
-	"strings"
 	"testing"
 )
 
@@ -121,43 +120,28 @@ func TestIsValidPassport(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-	passports, err := ioutil.ReadFile("passports.txt")
+	passports, err := file.LoadGroups("passports.txt")
 	assert.NilError(t, err, "failed to load passport.txt")
 
 	t.Run("Part 1", func(t *testing.T) {
-		var passport []string
 		var validPassports int64
-		for _, l := range strings.Split(string(passports), "\n") {
-			if l == "" {
-				if day04.IsValidPassportSimple(passport) {
-					validPassports++
-				}
-				passport = []string{}
-				continue
+		for _, passport := range passports {
+			if day04.IsValidPassportSimple(passport) {
+				validPassports++
 			}
-
-			passport = append(passport, l)
 		}
 
 		t.Logf("Valid passports: %d", validPassports)
 	})
 
 	t.Run("Part 2", func(t *testing.T) {
-		var passport []string
 		var validPassports int64
-		for _, l := range strings.Split(string(passports), "\n") {
-			if l == "" {
-				if day04.IsValidPassport(passport) {
-					validPassports++
-				}
-				passport = []string{}
-				continue
+		for _, passport := range passports {
+			if day04.IsValidPassport(passport) {
+				validPassports++
 			}
-
-			passport = append(passport, l)
 		}
 
 		t.Logf("Valid passports: %d", validPassports)
 	})
 }
-
