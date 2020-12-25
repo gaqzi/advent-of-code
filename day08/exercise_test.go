@@ -14,11 +14,17 @@ func TestHalting(t *testing.T) {
 	assert.Equal(t, 5, day08.Halting(instructions))
 }
 
-func TestExercise(t *testing.T) {
-	t.Run("Part 1", func(t *testing.T) {
-		instructions, err := file.Load("instructions.txt")
-		assert.NilError(t, err)
+func TestModifying(t *testing.T) {
+	instructions, err := file.Load("instructions.sample.txt")
+	assert.NilError(t, err)
 
-		t.Logf("Part 1 acc: %d", day08.Halting(instructions))
-	})
+	assert.Equal(t, 8, day08.Modifying(instructions))
+}
+
+func TestExercise(t *testing.T) {
+	instructions, err := file.Load("instructions.txt")
+	assert.NilError(t, err)
+
+	t.Logf("Part 1 acc: %d", day08.Halting(instructions))
+	t.Logf("Part 2 acc: %d", day08.Modifying(instructions))
 }
